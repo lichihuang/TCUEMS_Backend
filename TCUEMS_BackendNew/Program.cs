@@ -3,21 +3,25 @@ using System.Data.SqlClient;
 using System.Data;
 using TCUEMS_BackendNew.Data;
 using TCUEMS_BackendNew.Models;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Åª¨ú CORS ³]©w
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 var corsSettings = builder.Configuration.GetSection("CorsSettings").Get<CorsSettings>();
 
-// ¸ê®Æ®w³s½u¦r¦ê
 var connectionString = "Data Source=.;Initial Catalog=SemesterWarning;Integrated Security=true;";
 
 builder.Services.AddScoped<IDbConnection>(c => new SqlConnection(connectionString));
-builder.Services.AddTransient<ISemesterWarningRepository, SemesterWarningRepository>(provider =>
-    new SemesterWarningRepository(provider.GetRequiredService<IDbConnection>().ConnectionString));
 
-builder.Services.AddLogging(); // ²K¥[³o¤@¦æ¥H±Ò¥Î¤é»x
+builder.Services.AddLogging();
+
+builder.Services.AddTransient<ISemesterWarningRepository, SemesterWarningRepository>(provider =>
+{
+    var connectionString = provider.GetRequiredService<IDbConnection>().ConnectionString;
+    var logger = provider.GetRequiredService<ILogger<SemesterWarningRepository>>();
+    return new SemesterWarningRepository(connectionString, logger);
+});
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -34,7 +38,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Semester Warning API"));
 }
 
-// ³B²z CORS °ÝÃD
+// è™•ç† CORS å•é¡Œ
 app.UseCors(builder => builder.WithOrigins(corsSettings?.AllowedOrigins)
                               .AllowAnyHeader()
                               .AllowAnyMethod());
