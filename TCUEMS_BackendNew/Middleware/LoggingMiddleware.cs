@@ -1,4 +1,4 @@
-﻿public class LoggingMiddleware
+public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<LoggingMiddleware> _logger;
