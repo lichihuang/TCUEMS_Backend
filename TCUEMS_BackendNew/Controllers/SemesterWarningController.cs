@@ -61,6 +61,8 @@ namespace TCUEMS_BackendNew.Controllers
             }
         }
 
+
+        // 僅用到這個API
         [HttpPost("Combined")]
         public async Task<IActionResult> GetCombinedSemesterWarnings([FromBody] SemesterWarning searchCriteria)
         {
@@ -77,8 +79,9 @@ namespace TCUEMS_BackendNew.Controllers
 
                 _logger.LogInformation("Database query executed: GetSemesterWarningsByCriteria");
 
+                // 以學號合併學生預警資料
                 var combinedSemesterWarnings = semesterWarnings
-                    .GroupBy(sw => sw.w_std_no)
+                    .GroupBy(sw => sw.w_std_no) 
                     .Select(group => new {
                         StudentId = group.Key,
                         Warnings = group.Select(sw => new {
