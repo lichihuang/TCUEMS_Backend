@@ -9,6 +9,7 @@ public class LoggingMiddleware
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    // 中介軟體的Invoke方法，處理HTTP請求
     public async Task Invoke(HttpContext context)
     {
         _logger.LogInformation($"Request: {context.Request.Path}");
